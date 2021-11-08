@@ -20,7 +20,7 @@ jobs:
           dotnet-version: 3.1.101
             
       - name: Install dependencies
-        run: dotnet restore ./src
+        run: dotnet restore ./src/Azure.Functions.Extensions.DomainEventStreams
       
       - name: Build
-        run: dotnet build --configuration Release --no-restore ./src
+        run: dotnet build --configuration Release --no-restore ./src/Azure.Functions.Extensions.DomainEventStreams
