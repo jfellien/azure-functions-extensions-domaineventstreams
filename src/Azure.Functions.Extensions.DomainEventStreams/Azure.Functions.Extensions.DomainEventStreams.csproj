@@ -6,7 +6,7 @@
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/jfellien/azure-functions-extensions-domaineventstreams</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion></AssemblyVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
