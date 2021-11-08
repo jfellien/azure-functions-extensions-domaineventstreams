@@ -1,10 +1,10 @@
 using System;
-using Azure.Functions.Extensions.DomainEventStreams.EventsPublisher;
-using Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages;
+using AzureFunctions.Extensions.EventSourcing.EventsPublisher;
+using AzureFunctions.Extensions.EventSourcing.EventStreamStorages;
 using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Config;
 
-namespace Azure.Functions.Extensions.DomainEventStreams
+namespace AzureFunctions.Extensions.EventSourcing
 {
     [Extension("DomainEventStream")]
     public class DomainEventStreamBindingConfiguration : IExtensionConfigProvider

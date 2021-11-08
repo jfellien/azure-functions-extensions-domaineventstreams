@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages
+namespace AzureFunctions.Extensions.EventSourcing.EventStreamStorages
 {
     public class DomainEventSequence : List<SequencedDomainEvent>{}
 }

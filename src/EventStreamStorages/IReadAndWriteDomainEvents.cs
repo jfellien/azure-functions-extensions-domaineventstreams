@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages
+namespace AzureFunctions.Extensions.EventSourcing.EventStreamStorages
 {
     public interface IReadAndWriteDomainEvents
     {

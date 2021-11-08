@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages
+namespace AzureFunctions.Extensions.EventSourcing.EventStreamStorages
 {
     internal class LastSequenceNumberQueryResult
     {

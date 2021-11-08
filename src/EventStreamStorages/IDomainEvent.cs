@@ -1,4 +1,4 @@
-namespace Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages
+namespace AzureFunctions.Extensions.EventSourcing.EventStreamStorages
 {
     public interface IDomainEvent
     {

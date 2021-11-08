@@ -1,10 +1,10 @@
-using Azure.Functions.Extensions.DomainEventStreams;
+using AzureFunctions.Extensions.EventSourcing;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 
 [assembly: WebJobsStartup(typeof(DomainEventStreamBindingRegistration))]
 
-namespace Azure.Functions.Extensions.DomainEventStreams
+namespace AzureFunctions.Extensions.EventSourcing
 {
     public class DomainEventStreamBindingRegistration : IWebJobsStartup
     {

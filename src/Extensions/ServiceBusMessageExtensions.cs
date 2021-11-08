@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Text;
-using Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages;
+using AzureFunctions.Extensions.EventSourcing.EventStreamStorages;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 
-namespace Azure.Functions.Extensions.DomainEventStreams.Extensions
+namespace AzureFunctions.Extensions.EventSourcing.Extensions
 {
     public static class ServiceBusMessageExtensions
     {

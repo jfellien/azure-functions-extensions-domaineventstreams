@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Azure.WebJobs.Description;
 
-namespace Azure.Functions.Extensions.DomainEventStreams
+namespace AzureFunctions.Extensions.EventSourcing
 {
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
     [Binding]

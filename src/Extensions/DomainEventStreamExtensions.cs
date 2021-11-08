@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages;
+using AzureFunctions.Extensions.EventSourcing.EventStreamStorages;
 
-namespace Azure.Functions.Extensions.DomainEventStreams.Extensions
+namespace AzureFunctions.Extensions.EventSourcing.Extensions
 {
     public static class DomainEventStreamExtensions
     {

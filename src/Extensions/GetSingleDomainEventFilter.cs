@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages;
+using AzureFunctions.Extensions.EventSourcing.EventStreamStorages;
 
-namespace Azure.Functions.Extensions.DomainEventStreams.Extensions
+namespace AzureFunctions.Extensions.EventSourcing.Extensions
 {
     public class GetSingleDomainEventFilter<TSource> where TSource : IDomainEvent
     {
