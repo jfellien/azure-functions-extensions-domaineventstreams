@@ -22,7 +22,8 @@ jobs:
       - name: Install dependencies
         run: dotnet restore ./src
 
-      - id: get_version
+      - name: Detect package version
+        id: get_version
         uses: battila7/get-version-action@v2
       
       - name: Show version
