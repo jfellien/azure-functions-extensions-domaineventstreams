@@ -30,9 +30,10 @@ jobs:
       
       - name: Build
         run: dotnet build --configuration Release --no-restore ./src /p:PackageVersion=${{ steps.get_version.outputs.version-without-v }}
-      
+
       - name: Pack for NuGet
         run: dotnet pack  --configuration Release --no-build ./src/devCrowd.CustomBindings.EventSourcing.csproj -o . /p:PackageVersion=${{ steps.get_version.outputs.version-without-v }}
 
       - name: Publish to NuGet
         run: dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.EventSourcing_Nuget_ApiKey}} --skip-duplicate --no-symbols 1
+
