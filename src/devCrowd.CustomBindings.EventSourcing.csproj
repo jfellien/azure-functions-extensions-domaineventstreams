@@ -7,10 +7,13 @@
     <RepositoryUrl>https://github.com/jfellien/azure-functions-extensions-domaineventstreams</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Version>1.0.0</Version>
+    <PackageVersion>1.0.1-alpha</PackageVersion>
+    <Authors>janekf</Authors>
+    <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\ReadMe.md">
+    <None Include="..\ReadMe.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

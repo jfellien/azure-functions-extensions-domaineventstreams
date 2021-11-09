@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages
+namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
     internal class EventStoreDomainEventWrap
     {

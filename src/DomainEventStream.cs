@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure.Functions.Extensions.DomainEventStreams.EventsPublisher;
-using Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages;
+using devCrowd.CustomBindings.EventSourcing.EventsPublisher;
+using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
-namespace Azure.Functions.Extensions.DomainEventStreams
+namespace devCrowd.CustomBindings.EventSourcing
 {
     public class DomainEventStream
     {

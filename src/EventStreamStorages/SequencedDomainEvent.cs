@@ -1,4 +1,4 @@
-namespace Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages
+namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
     public class SequencedDomainEvent
     {

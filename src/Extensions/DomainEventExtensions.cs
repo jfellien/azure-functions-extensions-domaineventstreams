@@ -1,11 +1,11 @@
 using System.Text;
-using Azure.Functions.Extensions.DomainEventStreams.EventStreamStorages;
+using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 
 #nullable enable
 
-namespace Azure.Functions.Extensions.DomainEventStreams.Extensions
+namespace devCrowd.CustomBindings.EventSourcing.Extensions
 {
     public static class DomainEventExtensions
     {
