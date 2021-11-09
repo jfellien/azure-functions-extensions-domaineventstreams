@@ -20,10 +20,12 @@ jobs:
           dotnet-version: 3.1.101
             
       - name: Install dependencies
-        run: dotnet restore ./src/Azure.Functions.Extensions.DomainEventStreams
+        run: dotnet restore ./src
       
       - name: Build
-        run: dotnet build --configuration Release --no-restore ./src/Azure.Functions.Extensions.DomainEventStreams
+        run: dotnet build --configuration Release --no-restore ./src
+        
+      
         
       - name: Publish NuGet
         # You may pin to the exact commit or the version.
@@ -31,7 +33,7 @@ jobs:
         uses: brandedoutcast/publish-nuget@v2.5.5
         with:
           # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: ./src/Azure.Functions.Extensions.DomainEventStreams/Azure.Functions.Extensions.DomainEventStreams.csproj
+          PROJECT_FILE_PATH: ./src/devCrowd.CustomBindings.EventSourcing.csproj
           # NuGet package id, used for version detection & defaults to project name
           # PACKAGE_NAME: # optional
           # Filepath with version info, relative to root of repository & defaults to PROJECT_FILE_PATH
@@ -45,7 +47,7 @@ jobs:
           # Format of the git tag, [*] gets replaced with actual version
           # TAG_FORMAT: # optional, default is v*
           # API key to authenticate with NuGet server
-          NUGET_KEY: ${{secrets.DomainEventSteam_Nuget_Api_Key}}
+          NUGET_KEY: ${{secrets.EventSourcing_Nuget_ApiKey}}
           # NuGet server uri hosting the packages, defaults to https://api.nuget.org
           # NUGET_SOURCE: # optional, default is https://api.nuget.org
           # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
