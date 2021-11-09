@@ -33,11 +33,10 @@ namespace devCrowd.CustomBindings.EventSourcing
                 eventsCollectionName);
             
             var serviceBusConnectionString = Environment.GetEnvironmentVariable("EVENT_HANDLER_CONNECTION_STRING");
-            var contextTopicName = Environment.GetEnvironmentVariable("EVENT_HANDLER_TOPIC_NAME");
             
             var domainEventsPublisher = new ServiceBusDomainEventsPublisher(
                 serviceBusConnectionString,
-                contextTopicName);
+                attribute.ContextName);
             
             return new DomainEventStream(
                 attribute.ContextName,
