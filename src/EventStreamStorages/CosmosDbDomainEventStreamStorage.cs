@@ -6,7 +6,7 @@ using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AzureFunctions.Extensions.EventSourcing.EventStreamStorages
+namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
     internal class CosmosDbDomainEventStreamStorage : IReadAndWriteDomainEvents
     {

@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
-using AzureFunctions.Extensions.EventSourcing.EventStreamStorages;
-using AzureFunctions.Extensions.EventSourcing.Extensions;
+using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
+using devCrowd.CustomBindings.EventSourcing.Extensions;
 using Microsoft.Azure.ServiceBus;
 
-namespace AzureFunctions.Extensions.EventSourcing.EventsPublisher
+namespace devCrowd.CustomBindings.EventSourcing.EventsPublisher
 {
     internal class ServiceBusDomainEventsPublisher : IPublishDomainEvents
     {

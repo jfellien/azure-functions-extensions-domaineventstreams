@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using AzureFunctions.Extensions.EventSourcing.EventStreamStorages;
+using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
-namespace AzureFunctions.Extensions.EventSourcing.EventsPublisher
+namespace devCrowd.CustomBindings.EventSourcing.EventsPublisher
 {
     public interface IPublishDomainEvents
     {

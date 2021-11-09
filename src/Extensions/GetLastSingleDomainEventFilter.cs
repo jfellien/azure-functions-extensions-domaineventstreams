@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AzureFunctions.Extensions.EventSourcing.EventStreamStorages;
+using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
-namespace AzureFunctions.Extensions.EventSourcing.Extensions
+namespace devCrowd.CustomBindings.EventSourcing.Extensions
 {
     public class GetLastSingleDomainEventFilter<TSource> where TSource : IDomainEvent
     {

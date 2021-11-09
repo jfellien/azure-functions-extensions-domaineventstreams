@@ -1,4 +1,4 @@
-﻿namespace AzureFunctions.Extensions.EventSourcing
+﻿namespace devCrowd.CustomBindings.EventSourcing
 {
     public class DomainEventHeader
     {

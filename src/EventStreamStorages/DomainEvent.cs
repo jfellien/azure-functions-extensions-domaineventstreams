@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AzureFunctions.Extensions.EventSourcing.EventStreamStorages
+namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
     public abstract class DomainEvent : IDomainEvent
     {
