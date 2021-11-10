@@ -85,9 +85,27 @@ interested in the events can subscribe this topic.
 To get the `DomainEventStream` Attribute clean and simple the infrastructure configuration will happen in
 the Application Settings (or for local development in the local.settings.json file). The Binding expects a few settings.
 
-* EVENT_STORE_CONNECTION_STRING: The connection string, where the events will stored (only CosmosDB available yet)
+* EVENT_STORE_CONNECTION_STRING: The connection string, where the events will stored (only CosmosDB and SQL Server available)
 * EVENT_STORE_DB_NAME: Name of the dastabase where the events will stored
-* DOMAIN_EVENTS_COLLECTION_NAME: Name of the collection where the events will stored
+* DOMAIN_EVENTS_COLLECTION_NAME: Name of the collection where the events will stored (equal to table name if a SQL Server is the data sink)
 * EVENT_HANDLER_CONNECTION_STRING: Connection String to the ServiceBus which will publish the events after storing
 
 Any Domain Context needs its own topic in the ServiceBus. This topic will not created if not exists already. It should be part of automatic deployment.
+
+## Sql Server as sink
+If you use a Sql Server als Data source/EventSource you need a table to store the events. Here comes the Create script:
+
+```
+CREATE TABLE [<your table name>] (
+    [EventId]        VARCHAR (100) NOT NULL,
+    [EventName]      VARCHAR (200) NOT NULL,
+    [EventFullName]  VARCHAR (500) NOT NULL,
+    [IsoTimeStamp]   VARCHAR (30)  NOT NULL,
+    [SequenceNumber] BIGINT    NOT NULL,
+    [Context]        VARCHAR (200) NULL,
+    [Entity]         VARCHAR (200) NULL,
+    [EntityId]       VARCHAR (100) NULL,
+    [Payload]        VARCHAR (MAX) NOT NULL,
+    PRIMARY KEY CLUSTERED ([EventId] ASC)
+);
+```

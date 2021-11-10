@@ -27,6 +27,8 @@ namespace devCrowd.CustomBindings.EventSourcing
             _entityId = entityId;
             _storage = storage;
             _publisher = publisher;
+            
+            _historySequence = new DomainEventSequence();
         }
 
         public Task Append(IDomainEvent domainEvent)
@@ -67,16 +69,16 @@ namespace devCrowd.CustomBindings.EventSourcing
             return WriteToStorageAndLocalHistoryAndPublish(domainEvents, _context, _entity, entityId);
         }
 
-        public async Task<bool> IsEmpty()
+        public async Task<IEnumerable<IDomainEvent>> Events()
         {
-            if (_historySequence == null)
+            if (_historySequence.HasBeenSequenced == false)
             {
                 _historySequence = await GetFromStorageByGivenParameters();
             }
-            
-            return _historySequence.Count() == 0;
-        }
 
+            return _historySequence.Select(x => x.Instance);
+        }
+        
         private Task<DomainEventSequence> GetFromStorageByGivenParameters()
         {
             if (string.IsNullOrWhiteSpace(_entity)
@@ -112,14 +114,15 @@ namespace devCrowd.CustomBindings.EventSourcing
         {
             return await _storage.Write(domainEvent, context, entity, entityId);
         }
+        
         private void AddToLocalHistory(IDomainEvent domainEvent, long sequenceNumber)
         {
-            // History is null when no Read is happen yet
-            if (_historySequence != null)
+            if(_historySequence.HasBeenSequenced)
             {
                 _historySequence.Add(new SequencedDomainEvent(sequenceNumber, domainEvent));
             }
         }
+        
         private async Task PublishChanges(IDomainEvent domainEvent)
         {
             await _publisher.Publish(domainEvent);
