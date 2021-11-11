@@ -93,7 +93,9 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
         private async Task<DomainEventSequence> ReadDomainEventsStream(QueryDefinition query, CancellationToken cancellationToken)
         {
             var events = new DomainEventSequence();
-
+            
+            events.HasBeenSequenced = true;
+            
             using (var resultSet = _domainEventsContainer.GetItemQueryIterator<JObject>(query))
             {
                 while (resultSet.HasMoreResults)

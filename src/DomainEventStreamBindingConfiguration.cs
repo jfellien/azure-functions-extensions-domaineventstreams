@@ -27,12 +27,23 @@ namespace devCrowd.CustomBindings.EventSourcing
                 throw new ArgumentException("EVENT_STORE_CONNECTION_STRING not set in Application Settings");
             }
             
-            var domainEventStreamStorage = new CosmosDbDomainEventStreamStorage(
-                eventStoreConnectionString, 
-                eventStoreDatabaseName, 
+            var domainEventStreamStorage = DomainEventStreamStorageLibrary.GetInstanceBy(
+                eventStoreConnectionString,
+                eventStoreDatabaseName,
                 eventsCollectionName);
+
+            if (domainEventStreamStorage == null)
+            {
+                throw new ArgumentException(
+                    $"Unexpected type of Connection String {eventStoreConnectionString[..15]}. Can not instantiate a DomainEventStream Storage. Please fix the Connection String or use only a Sql Server or CosmosDB Connection String.");
+            }
             
             var serviceBusConnectionString = Environment.GetEnvironmentVariable("EVENT_HANDLER_CONNECTION_STRING");
+            
+            if (string.IsNullOrEmpty(serviceBusConnectionString))
+            {
+                throw new ArgumentException("EVENT_HANDLER_CONNECTION_STRING not set in Application Settings");
+            }
             
             var domainEventsPublisher = new ServiceBusDomainEventsPublisher(
                 serviceBusConnectionString,
