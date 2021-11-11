@@ -28,7 +28,7 @@
         {
             var lowerVersion = connectionString.ToLowerInvariant();
 
-            return lowerVersion.StartsWith("accountendpoint=https://") && lowerVersion.Contains("documents.azure.com:433");
+            return lowerVersion.StartsWith("accountendpoint=https://");
         }
     }
 }
