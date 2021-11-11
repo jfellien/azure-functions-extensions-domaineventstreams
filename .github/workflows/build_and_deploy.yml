@@ -26,10 +26,7 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
       
-      - name: Show version
-        run: echo ${{ steps.get_version.outputs.version }}
-      
-      - name: Build
+      - name: Build Version ${{ steps.get_version.outputs.version }}+${{ github.run_number }}
         run: dotnet build --configuration Release --no-restore ./src /p:PackageVersion=${{ steps.get_version.outputs.version-without-v }}
 
       - name: Pack for NuGet
