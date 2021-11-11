@@ -35,7 +35,7 @@ namespace devCrowd.CustomBindings.EventSourcing
             if (domainEventStreamStorage == null)
             {
                 throw new ArgumentException(
-                    $"Unexpected type of Connection String {eventStoreConnectionString[..15]}. Can not instantiate a DomainEventStream Storage. Please fix the Connection String or use only a Sql Server or CosmosDB Connection String.");
+                    $"Unexpected type of Connection String (starts with: '{eventStoreConnectionString[..15]}'). Can not instantiate a DomainEventStream Storage. Please fix the Connection String or use only a Sql Server or CosmosDB Connection String.");
             }
             
             var serviceBusConnectionString = Environment.GetEnvironmentVariable("EVENT_HANDLER_CONNECTION_STRING");
