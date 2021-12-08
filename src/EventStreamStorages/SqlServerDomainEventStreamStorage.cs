@@ -10,65 +10,65 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
     public class SqlServerDomainEventStreamStorage : IReadAndWriteDomainEvents
     {
+        private readonly string _connectionString;
         private readonly string _dbName;
         private readonly string _tableName;
-        private readonly SqlConnection _connection;
         private long _lastSequenceNumberOfStream;
         private bool _domainEventStreamHasBeenRead;
         private readonly JsonSerializerSettings _defaultSerializerSettings;
 
         public SqlServerDomainEventStreamStorage(string connectionString, string dbName, string tableName)
         {
+            _connectionString = connectionString;
             _dbName = dbName;
             _tableName = tableName;
-            _connection = new SqlConnection(connectionString);
-            
+
             _defaultSerializerSettings = new JsonSerializerSettings
             {
                 DateParseHandling = DateParseHandling.None
             };
         }
-        
-        public Task<DomainEventSequence> ReadBy(string context, CancellationToken cancellationToken)
+
+        public async Task<DomainEventSequence> ReadBy(string context, CancellationToken cancellationToken)
         {
             var query = new SqlCommand(
                 $"SELECT * FROM [{_tableName}] " +
                 $"WHERE context=@context " +
-                $"ORDER BY { SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }", _connection);
+                $"ORDER BY { SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }");
 
             query.Parameters.AddWithValue("@context", context.ToLower());
 
-            return ReadDomainEventStream(query, cancellationToken);
+            return await ReadDomainEventStream(query, cancellationToken);
         }
 
-        public Task<DomainEventSequence> ReadBy(string context, string entity, CancellationToken cancellationToken)
+        public async Task<DomainEventSequence> ReadBy(string context, string entity, CancellationToken cancellationToken)
         {
             var query = new SqlCommand(
                 $"SELECT * FROM [{_tableName}] " +
                 $"WHERE { SqlServerDomainEventStreamStorageColumnNames.Context }=@context " +
-                $"AND { SqlServerDomainEventStreamStorageColumnNames.Entity }=@entity" +
-                $"ORDER BY { SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }", _connection);
-            
+                $"AND { SqlServerDomainEventStreamStorageColumnNames.Entity }=@entity " +
+                $"ORDER BY { SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }");
+
             query.Parameters.AddWithValue("@context", context.ToLower());
             query.Parameters.AddWithValue("@entity", entity.ToLower());
 
-            return ReadDomainEventStream(query, cancellationToken);
+            return await ReadDomainEventStream(query, cancellationToken);
         }
 
-        public Task<DomainEventSequence> ReadBy(string context, string entity, string entityId, CancellationToken cancellationToken)
+        public async Task<DomainEventSequence> ReadBy(string context, string entity, string entityId, CancellationToken cancellationToken)
         {
             var query = new SqlCommand(
                 $"SELECT * FROM [{_tableName}] " +
                 $"WHERE { SqlServerDomainEventStreamStorageColumnNames.Context }=@context " +
                 $"AND { SqlServerDomainEventStreamStorageColumnNames.Entity }=@entity " +
                 $"AND { SqlServerDomainEventStreamStorageColumnNames.EntityId }=@entityId " +
-                $"ORDER BY { SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }", _connection);
-            
+                $"ORDER BY { SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }");
+
             query.Parameters.AddWithValue("@context", context.ToLower());
             query.Parameters.AddWithValue("@entity", entity.ToLower());
             query.Parameters.AddWithValue("@entityId", entityId);
 
-            return ReadDomainEventStream(query, cancellationToken);
+            return await ReadDomainEventStream(query, cancellationToken);
         }
 
         public async Task<long> Write(IDomainEvent domainEvent, string context, string entity = null, string entityId = null)
@@ -77,29 +77,30 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
                 $"INSERT INTO [{_tableName}] (" +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.EventId }, " +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.Context }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.EntityId }, " +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.Entity }, " +
+                $"{ SqlServerDomainEventStreamStorageColumnNames.EntityId }, " +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.EventName }, " +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.EventFullName }, " +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }, " +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.SequenceNumber }, " +
                 $"{ SqlServerDomainEventStreamStorageColumnNames.PayLoad }) " +
-                $"VALUES (@eventId, @context, @entityId, @entity, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload)";
-            
-            await using var command = new SqlCommand(insertQuery, _connection);
-            
+                $"VALUES (@eventId, @context, @entity, @entityId, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload)";
+
+            using var connection = new SqlConnection(_connectionString);
+            await using var command = new SqlCommand(insertQuery, connection);
+
             var serializedDomainEvent = JsonConvert.SerializeObject(domainEvent);
             var nextSequenceNumber = await NextSequenceNumber(context, entity, entityId);
-                
+
             command.Parameters.AddWithValue("@eventId", Guid.NewGuid().ToString());
             command.Parameters.AddWithValue("@context", context.ToLowerInvariant());
-            command.Parameters.AddWithValue("@entity", entity?.ToLowerInvariant());
-            command.Parameters.AddWithValue("@entityId", entityId);
             command.Parameters.AddWithValue("@eventName", domainEvent.GetType().Name);
             command.Parameters.AddWithValue("@eventFullName", domainEvent.GetType().AssemblyQualifiedName);
             command.Parameters.AddWithValue("@isoTimestamp", DateTime.UtcNow.ToString("O"));
             command.Parameters.AddWithValue("@sequenceNumber", nextSequenceNumber);
             command.Parameters.AddWithValue("@payload", serializedDomainEvent);
+            command.Parameters.AddWithValue("@entity", entity.ToLowerInvariant());
+            command.Parameters.AddWithValue("@entityId", entityId);
 
             try
             {
@@ -123,17 +124,22 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
             var events = new DomainEventSequence();
 
             events.HasBeenSequenced = true;
-            
-            await command.Connection.OpenAsync(cancellationToken);
 
             try
             {
+                using SqlConnection connection = new SqlConnection(_connectionString);
+
+                command.Connection = connection;
+                connection.Open();
+
                 var reader = await command.ExecuteReaderAsync(cancellationToken);
 
                 while (await reader.ReadAsync(cancellationToken))
                 {
                     events.Add(GetDomainEventFromReader(reader));
                 }
+
+                reader.Close();
 
                 _lastSequenceNumberOfStream = events.Any()
                     ? events.Last().SequenceNumber
@@ -143,7 +149,7 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
             }
             finally
             {
-                await command.Connection.CloseAsync();
+                command.Connection.Close();
             }
 
             return events;
@@ -153,7 +159,7 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
         {
             var eventType = reader.GetString(SqlServerDomainEventStreamStorageColumnNames.EventFullName);
             var domainEventType = Type.GetType(eventType);
-            
+
             if (domainEventType == null)
             {
                 throw new TypeAccessException(
@@ -163,15 +169,15 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
             var domainEventAsString = reader.GetString(SqlServerDomainEventStreamStorageColumnNames.PayLoad);
             var domainEventInstance =
                 JsonConvert.DeserializeObject(domainEventAsString, domainEventType, _defaultSerializerSettings) as IDomainEvent;
-            
-            
+
+
             var sequenceNumber = reader.GetInt64(SqlServerDomainEventStreamStorageColumnNames.SequenceNumber);
-            
+
             var sequencedDomainEvent = new SequencedDomainEvent(sequenceNumber, domainEventInstance);
 
             return sequencedDomainEvent;
         }
-        
+
         private async Task<long> NextSequenceNumber(string context, string entity, string entityId)
         {
             // If we don't have read the stream already,
@@ -187,20 +193,21 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 
             return _lastSequenceNumberOfStream;
         }
-        
+
         private async Task<long> GetLastSequenceNumberOfStream(string context, string entity, string entityId)
         {
             var query = BuildQueryStringForLastSequenceNumber(context, entity, entityId);
 
-            await using var command = new SqlCommand(query,_connection);
-            
+            using var connection = new SqlConnection(_connectionString);
+            await using var command = new SqlCommand(query, connection);
+
             command.Parameters.AddWithValue("@context", context.ToLower());
-                
+
             if (string.IsNullOrWhiteSpace(entity) == false)
             {
                 command.Parameters.AddWithValue("@entity", entity.ToLower());
             }
-                
+
             if (string.IsNullOrWhiteSpace(entityId) == false)
             {
                 command.Parameters.AddWithValue("@entityId", entityId.ToLower());
@@ -221,12 +228,12 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
             {
                 await command.Connection.CloseAsync();
             }
-            
+
         }
 
         private string BuildQueryStringForLastSequenceNumber(string context, string entity, string entityId)
         {
-            var queryString = 
+            var queryString =
                 $"SELECT MAX({ SqlServerDomainEventStreamStorageColumnNames.SequenceNumber }) AS maxSequenceNumber " +
                 $"FROM [{_tableName}] " +
                 $"WHERE {SqlServerDomainEventStreamStorageColumnNames.Context}=@context";
