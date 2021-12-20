@@ -21,14 +21,5 @@ namespace devCrowd.CustomBindings.EventSourcing.Extensions
         {
             return _sourceStream.OfType<TSource>().SingleOrDefault(filterExpression);
         }
-        
-        /// <summary>
-        /// Gets a single event of given type. If no event given it gets an default(TSource).
-        /// </summary>
-        /// <returns></returns>
-        public TSource Single()
-        {
-            return _sourceStream.OfType<TSource>().SingleOrDefault();
-        }
     }
 }
