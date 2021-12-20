@@ -28,7 +28,7 @@ namespace devCrowd.CustomBindings.EventSourcing.Extensions
         {
             return new GetLastSingleDomainEventFilter<T>(domainEvents);
         }
-
+        
         public static DomainEventChecks<T> Event<T>(this IEnumerable<object> domainEvents) where T : IDomainEvent
         {
             return new DomainEventChecks<T>(domainEvents);
