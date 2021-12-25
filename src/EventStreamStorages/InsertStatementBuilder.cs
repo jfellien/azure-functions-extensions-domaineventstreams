@@ -4,7 +4,14 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
     internal class InsertStatementBuilder
     {
-        internal static string ColumnList(string entity = null, string entityId = null)
+        public static string GetStatement(string tableName, string entity = null, string entityId = null)
+        {
+            return $"INSERT INTO [{tableName}] " + 
+                $"({ ColumnList(entity, entityId) }) " + 
+                $"VALUES ({ ParameterList(entity, entityId)})";
+        }
+
+        private static string ColumnList(string entity = null, string entityId = null)
         {
             var columnList = new StringBuilder(
                 $"{SqlServerDomainEventStreamStorageColumnNames.EventId}, " +
@@ -28,7 +35,7 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
             return columnList.ToString();
         }
 
-        internal static string ParameterList(string entity = null, string entityId = null)
+        private  static string ParameterList(string entity = null, string entityId = null)
         {
             var parameterList = new StringBuilder("@eventId, @context, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload");
 

@@ -73,11 +73,8 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 
         public async Task<long> Write(IDomainEvent domainEvent, string context, string entity = null, string entityId = null)
         {
-            var insertQuery =
-                $"INSERT INTO [{_tableName}] " + 
-                $"({ InsertStatementBuilder.ColumnList(entity, entityId) }) " + 
-                $"VALUES ({ InsertStatementBuilder.ParameterList(entity, entityId)})";
-
+            var insertQuery = InsertStatementBuilder.GetStatement(_tableName, entity, entityId);
+            
             await using var connection = new SqlConnection(_connectionString);
             await using var command = new SqlCommand(insertQuery, connection);
 

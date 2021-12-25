@@ -14,6 +14,8 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Remove="devCrowd.CustomBindingsEventSourcing.Tests\**" />
+    <None Remove="devCrowd.CustomBindings.EventSourcing.Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +24,22 @@
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.30" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Core" Version="3.0.30" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="devCrowd.CustomBindingsEventSourcing.Tests\**" />
+    <Compile Remove="devCrowd.CustomBindings.EventSourcing.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="devCrowd.CustomBindingsEventSourcing.Tests\**" />
+    <EmbeddedResource Remove="devCrowd.CustomBindings.EventSourcing.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>devCrowd.CustomBindings.EventSourcing.Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>
