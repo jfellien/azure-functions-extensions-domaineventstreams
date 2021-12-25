@@ -74,19 +74,11 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
         public async Task<long> Write(IDomainEvent domainEvent, string context, string entity = null, string entityId = null)
         {
             var insertQuery =
-                $"INSERT INTO [{_tableName}] (" +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.EventId }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.Context }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.Entity }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.EntityId }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.EventName }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.EventFullName }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.IsoTimeStamp }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.SequenceNumber }, " +
-                $"{ SqlServerDomainEventStreamStorageColumnNames.PayLoad }) " +
-                $"VALUES (@eventId, @context, @entity, @entityId, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload)";
+                $"INSERT INTO [{_tableName}] " + 
+                $"({ InsertStatementBuilder.ColumnList(entity, entityId) }) " + 
+                $"VALUES ({ InsertStatementBuilder.ParameterList(entity, entityId)})";
 
-            using var connection = new SqlConnection(_connectionString);
+            await using var connection = new SqlConnection(_connectionString);
             await using var command = new SqlCommand(insertQuery, connection);
 
             var serializedDomainEvent = JsonConvert.SerializeObject(domainEvent);
@@ -99,8 +91,16 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
             command.Parameters.AddWithValue("@isoTimestamp", DateTime.UtcNow.ToString("O"));
             command.Parameters.AddWithValue("@sequenceNumber", nextSequenceNumber);
             command.Parameters.AddWithValue("@payload", serializedDomainEvent);
-            command.Parameters.AddWithValue("@entity", entity.ToLowerInvariant());
-            command.Parameters.AddWithValue("@entityId", entityId);
+            
+            if (string.IsNullOrEmpty(entity) == false)
+            {
+                command.Parameters.AddWithValue("@entity", entity.ToLowerInvariant());
+            }
+
+            if (string.IsNullOrEmpty(entityId) == false)
+            {
+                command.Parameters.AddWithValue("@entityId", entityId);
+            }
 
             try
             {
