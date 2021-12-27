@@ -71,29 +71,52 @@ namespace devCrowd.CustomBindings.EventSourcing
 
         public async Task<IEnumerable<IDomainEvent>> Events()
         {
-            if (_historySequence.HasBeenSequenced == false)
+            if (_historySequence.HasBeenSequenced)
             {
-                _historySequence = await GetFromStorageByGivenParameters();
+                return _historySequence.Select(x => x.Instance);
+            }
+
+            var storedSequence = await GetFromStorageByGivenParameters();
+            
+            if (_historySequence.Any())
+            {
+                var currentSequence = _historySequence.ToList();
+                _historySequence.Clear();
+
+                _historySequence.AddRange(storedSequence);
+                _historySequence.AddRange(currentSequence);
+            }
+            else
+            {
+                _historySequence = storedSequence;
             }
 
             return _historySequence.Select(x => x.Instance);
         }
         
-        private Task<DomainEventSequence> GetFromStorageByGivenParameters()
+        private async Task<DomainEventSequence> GetFromStorageByGivenParameters()
         {
+            DomainEventSequence domainEventSequence = null;
+            
             if (string.IsNullOrWhiteSpace(_entity)
                 && string.IsNullOrWhiteSpace(_entityId))
             {
-                return _storage.ReadBy(_context, default);
+                domainEventSequence = await _storage.ReadBy(_context, default);
             }
 
             if (string.IsNullOrWhiteSpace(_entity) == false
                 && string.IsNullOrWhiteSpace(_entityId))
             {
-                return _storage.ReadBy(_context, _entity, default);
+                domainEventSequence = await _storage.ReadBy(_context, _entity, default);
             }
 
-            return _storage.ReadBy(_context, _entity, _entityId, default);
+            if (string.IsNullOrWhiteSpace(_entity) == false
+                && string.IsNullOrWhiteSpace(_entityId) == false)
+            {
+                domainEventSequence = await _storage.ReadBy(_context, _entity, _entityId, default);
+            }
+
+            return domainEventSequence ?? new DomainEventSequence();
         }
 
         private async Task WriteToStorageAndLocalHistoryAndPublish(
@@ -117,10 +140,7 @@ namespace devCrowd.CustomBindings.EventSourcing
         
         private void AddToLocalHistory(IDomainEvent domainEvent, long sequenceNumber)
         {
-            if(_historySequence.HasBeenSequenced)
-            {
-                _historySequence.Add(new SequencedDomainEvent(sequenceNumber, domainEvent));
-            }
+            _historySequence.Add(new SequencedDomainEvent(sequenceNumber, domainEvent));
         }
         
         private async Task PublishChanges(IDomainEvent domainEvent)
