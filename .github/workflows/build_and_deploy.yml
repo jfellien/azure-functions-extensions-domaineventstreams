@@ -3,8 +3,6 @@ name: CI
 on:
   push:
     branches: [ release/* ]
-  pull_request:
-    branches: [ release/* ]
 
   workflow_dispatch:
 
@@ -21,6 +19,9 @@ jobs:
             
       - name: Install dependencies
         run: dotnet restore ./src
+        
+      - name: Run Tests
+        run: dotnet test ./src
 
       - name: Detect package version
         id: get_version
