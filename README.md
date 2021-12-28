@@ -1,8 +1,7 @@
 # Azure Functions Extensions DomainEventStream
 
 A simple to use Custom Binding for Azure Functions which represents a Domain Event Stream.
-The Stream can be stored in a CosmosDB or coming in a later release SQL Server or Table Storage.
-Only by set up the connection string the storage will be used.
+The Stream can be stored in a CosmosDB or MS SQL Server, only by set up the connection string the storage will use.
 
 ## How to use
 
@@ -93,7 +92,7 @@ the Application Settings (or for local development in the local.settings.json fi
 Any Domain Context needs its own topic in the ServiceBus. This topic will not created if not exists already. It should be part of automatic deployment.
 
 ## Sql Server as sink
-If you use a Sql Server als Data source/EventSource you need a table to store the events. Here comes the Create script:
+If you use a Sql Server as Data Source/EventSource you need a table to store the events. Here comes the Create script:
 
 ```
 CREATE TABLE [<your table name>] (
