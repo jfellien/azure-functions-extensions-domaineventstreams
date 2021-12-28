@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
-    internal class CosmosDbDomainEventStreamStorage : IReadAndWriteDomainEvents
+    public class CosmosDbDomainEventStreamStorage : IReadAndWriteDomainEvents
     {
         private bool _domainEventStreamHasBeenRead;
         private long _lastSequenceNumberOfStream;
@@ -69,7 +69,7 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 
         public async Task<long> Write(IDomainEvent domainEvent, string context, string entity = null, string entityId = null)
         {
-            var domainEventWrap = new EventStoreDomainEventWrap
+            var domainEventWrap = new DomainEventWrap
             {
                 EventId = Guid.NewGuid().ToString(),
 

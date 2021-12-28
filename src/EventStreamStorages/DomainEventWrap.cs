@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
-    internal class EventStoreDomainEventWrap
+    internal class DomainEventWrap
     {
         [JsonProperty("id")]
         public string EventId { get; set; }

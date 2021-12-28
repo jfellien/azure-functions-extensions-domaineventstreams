@@ -5,7 +5,7 @@ using Microsoft.Azure.ServiceBus;
 
 namespace devCrowd.CustomBindings.EventSourcing.EventsPublisher
 {
-    internal class ServiceBusDomainEventsPublisher : IPublishDomainEvents
+    public class ServiceBusDomainEventsPublisher : IPublishDomainEvents
     {
         private readonly TopicClient _topicClient;
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
 namespace devCrowd.CustomBindings.EventSourcing.Extensions
@@ -28,7 +29,19 @@ namespace devCrowd.CustomBindings.EventSourcing.Extensions
         {
             return new GetLastSingleDomainEventFilter<T>(domainEvents);
         }
-
+        
+        public static T GetSingle<T>(this IEnumerable<object> domainEvents) 
+            where T : IDomainEvent
+        {
+            return domainEvents.OfType<T>().Single();
+        }
+        
+        public static IEnumerable<T> GetAll<T>(this IEnumerable<object> domainEvents) 
+            where T : IDomainEvent
+        {
+            return domainEvents.OfType<T>();
+        }
+        
         public static DomainEventChecks<T> Event<T>(this IEnumerable<object> domainEvents) where T : IDomainEvent
         {
             return new DomainEventChecks<T>(domainEvents);
