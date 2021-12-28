@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using devCrowd.CustomBindings.EventSourcing.EventsPublisher;
 using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
@@ -94,5 +95,177 @@ public class DomainStreamExtensionTests
         var firstEvent = events.GetLast<MyFilterableSampleEvent>().Where(x => x.FilterableValue == FILTER_VALUE);
 
         firstEvent.Header.RequesterId.Should().Be("1112");
+    }
+
+    [Fact]
+    public async Task WhenRequestForEarlierEventThanAnOther_ItShouldReturnTrue()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events.Event<MySampleEvent>().HappenedEarlierThan<MyFilterableSampleEvent>();
+
+        compareResult.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForEarlierEventThanAnOther_ItShouldReturnFalse()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events.Event<MyFilterableSampleEvent>().HappenedEarlierThan<MySampleEvent>();
+
+        compareResult.Should().BeFalse();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForLaterEventThanAnOther_ItShouldReturnTrue()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events.Event<MyFilterableSampleEvent>().HappenedLaterThan<MySampleEvent>();
+
+        compareResult.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForLaterEventThanAnOther_ItShouldReturnFalse()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events.Event<MySampleEvent>().HappenedLaterThan<MyFilterableSampleEvent>();
+
+        compareResult.Should().BeFalse();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificLaterEventThanAnOther_ItShouldReturnFalse()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events
+            .Event<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "003")
+            .HappenedLaterThan<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "004");
+
+        compareResult.Should().BeFalse();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificLaterEventThanAnOther_ItShouldReturnTrue()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events
+            .Event<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "004")
+            .HappenedLaterThan<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "003");
+
+        compareResult.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificLaterEventThanAnOther_ItShouldThrowException()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        FluentActions.Invoking(() => events
+                .Event<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "003")
+                .HappenedLaterThan<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "010"))
+            .Should().Throw<ArgumentException>();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificLaterEventThanNotExistingOther_ItShouldThrowException()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        FluentActions.Invoking(() => events
+                .Event<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "010")
+                .HappenedLaterThan<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "003"))
+            .Should().Throw<ArgumentException>();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificEarlierEventThanAnOther_ItShouldReturnTrue()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events
+            .Event<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "003")
+            .HappenedEarlierThan<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "004");
+
+        compareResult.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificEarlierEventThanAnOther_ItShouldReturnFalse()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        var compareResult = events
+            .Event<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "004")
+            .HappenedEarlierThan<MySampleEvent>()
+            .Where(x => x.Header.RequesterId == "003");
+
+        compareResult.Should().BeFalse();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificEarlierEventThanAnOther_ItShouldThrowException()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        FluentActions.Invoking(() => events
+                .Event<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "003")
+                .HappenedLaterThan<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "010"))
+            .Should().Throw<ArgumentException>();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForSpecificEarlierEventThanNotExistingOther_ItShouldThrowException()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+
+        FluentActions.Invoking(() => events
+                .Event<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "010")
+                .HappenedLaterThan<MySampleEvent>()
+                .Where(x => x.Header.RequesterId == "003"))
+            .Should().Throw<ArgumentException>();
     }
 }
