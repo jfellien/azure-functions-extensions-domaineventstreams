@@ -1,6 +1,6 @@
 ﻿namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
 {
-    internal class SqlServerDomainEventStreamStorageColumnNames
+    internal static class SqlServerDomainEventStreamStorageColumnNames
     {
         public const string EventId = "EventId";
         public const string EventName = "EventName";

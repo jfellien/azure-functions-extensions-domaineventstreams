@@ -108,3 +108,8 @@ CREATE TABLE [<your table name>] (
     PRIMARY KEY CLUSTERED ([EventId] ASC)
 );
 ```
+
+## Use the DomainEventStream
+
+In many cases you will use the Event Stream to get information about the history. What is happen in the past? Do we have stored an specific event already? And so on.
+That's why this library provides a bunch of DomainEventStream Extension methods. [Here](README-EXTENSIONS.md) you'll find the documentation.  

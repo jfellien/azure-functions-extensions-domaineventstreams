@@ -17,7 +17,7 @@ public class DomainStreamExtensionTests
     private const string ENTITY = "entity";
     private const string ENTITY_ID = "entityID";
     
-    private DomainEventStream _domainEventStream;
+    private readonly DomainEventStream _domainEventStream;
     
     public DomainStreamExtensionTests()
     {
@@ -40,11 +40,13 @@ public class DomainStreamExtensionTests
 
         eventStoreMock.Setup(x => x.ReadBy(context, entity, entityId, default)).ReturnsAsync(() =>
         {
-            var domainEventSequence = new DomainEventSequence();
-            
-            domainEventSequence.Add(new SequencedDomainEvent(1, new MySampleEvent("003")));
-            domainEventSequence.Add(new SequencedDomainEvent(2, new MySampleEvent("004")));
-            domainEventSequence.Add(new SequencedDomainEvent(3, new MySampleEvent("005")));
+            var domainEventSequence = new DomainEventSequence
+            {
+                new(1, new MySampleEvent("003")),
+                new(2, new MySampleEvent("004")),
+                new(3, new MySampleEvent("005")),
+                new(4, new MySingleEvent("011"))
+            };
 
             return domainEventSequence;
         });
@@ -59,18 +61,41 @@ public class DomainStreamExtensionTests
         
         events.Should().NotBeNull();
         
-        var allSampleEvents = events.GetAll<MySampleEvent>();
+        var allSampleEvents = events.Get<MySampleEvent>().All().ToArray();
 
         allSampleEvents.Count().Should().Be(5);
 
-        var samplesAsArray = allSampleEvents.ToArray();
+        allSampleEvents[0].Header.RequesterId.Should().Be("003");
+        allSampleEvents[1].Header.RequesterId.Should().Be("004");
+        allSampleEvents[2].Header.RequesterId.Should().Be("005");
+        allSampleEvents[3].Header.RequesterId.Should().Be("001");
+        allSampleEvents[4].Header.RequesterId.Should().Be("002");
 
-        samplesAsArray[0].Header.RequesterId.Should().Be("003");
-        samplesAsArray[1].Header.RequesterId.Should().Be("004");
-        samplesAsArray[2].Header.RequesterId.Should().Be("005");
-        samplesAsArray[3].Header.RequesterId.Should().Be("001");
-        samplesAsArray[4].Header.RequesterId.Should().Be("002");
+    }
+    
+    [Fact]
+    public async Task WhenRequestAnyEventOfOneType_ItShouldReturnAListOfEvents()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+        
+        var anySampleEvents = events.Get<MySampleEvent>().Any().Where(e => e.Header.RequesterId is "003" or "002");
 
+        anySampleEvents.Count().Should().Be(2);
+    }
+    
+    [Fact]
+    public async Task WhenRequestForAnyNotExistingEventOfOneType_ItShouldReturnAnEmptyList()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+        
+        events.Should().NotBeNull();
+        
+        var anySampleEvents = events.Get<MyNotExistingEvent>().Any().Where(e => e.Header.RequesterId is "003" or "002");
+        
+        anySampleEvents.Should().NotBeNull();
+        anySampleEvents.Count().Should().Be(0);
     }
 
     [Fact]
@@ -80,7 +105,7 @@ public class DomainStreamExtensionTests
         
         events.Should().NotBeNull();
 
-        var firstEvent = events.GetFirst<MyFilterableSampleEvent>().Where(x => x.FilterableValue == FILTER_VALUE);
+        var firstEvent = events.Get<MyFilterableSampleEvent>().First().Where(x => x.FilterableValue == FILTER_VALUE);
 
         firstEvent.Header.RequesterId.Should().Be("1111");
     }
@@ -92,7 +117,7 @@ public class DomainStreamExtensionTests
         
         events.Should().NotBeNull();
 
-        var firstEvent = events.GetLast<MyFilterableSampleEvent>().Where(x => x.FilterableValue == FILTER_VALUE);
+        var firstEvent = events.Get<MyFilterableSampleEvent>().Last().Where(x => x.FilterableValue == FILTER_VALUE);
 
         firstEvent.Header.RequesterId.Should().Be("1112");
     }
@@ -267,5 +292,88 @@ public class DomainStreamExtensionTests
                 .HappenedLaterThan<MySampleEvent>()
                 .Where(x => x.Header.RequesterId == "003"))
             .Should().Throw<ArgumentException>();
+    }
+    
+    [Fact]
+    public async Task WhenRequestForExistingSingleEvent_ItShouldReturnTheEvent()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var singleEvent = events.Get<MySingleEvent>().TheOnlyOne();
+
+        singleEvent.Should().NotBeNull();
+        singleEvent.Header.RequesterId.Should().Be("011");
+    }
+    
+    [Fact]
+    public async Task WhenRequestForNotExistingSingleEvent_ItShouldReturnNull()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var singleEvent = events.Get<MyNotExistingEvent>().TheOnlyOne();
+
+        singleEvent.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenRequestForOneSpecificEventByExpression_ItShouldReturnTheEvent()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var singleEvent = events.Get<MySampleEvent>().Where(e => e.Header.RequesterId is "003");
+
+        singleEvent.Should().NotBeNull();
+
+        singleEvent.Header.RequesterId.Should().Be("003");
+    }
+    
+    [Fact]
+    public async Task WhenRequestForOneSpecificNotExistingEventByExpression_ItShouldReturnNull()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var singleEvent = events.Get<MySampleEvent>().Where(e => e.Header.RequesterId is "030");
+
+        singleEvent.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task WhenCheckForAnyExistingEvent_ItShouldReturnTrue()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var exists = events.Event<MySampleEvent>().Exists();
+
+        exists.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task WhenCheckForAnyNotExistingEvent_ItShouldReturnFalse()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var exists = events.Event<MyNotExistingEvent>().Exists();
+
+        exists.Should().BeFalse();
+    }
+    
+    [Fact]
+    public async Task WhenCheckForAnyExistingEventByExpression_ItShouldReturnTrue()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var exists = events.Event<MySampleEvent>().Where(e => e.Header.RequesterId is "003").Exists();
+
+        exists.Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task WhenCheckForAnyNotExistingEventByExpression_ItShouldReturnFalse()
+    {
+        var events = (await _domainEventStream.Events()).ToList();
+
+        var exists = events.Event<MySampleEvent>().Where(e => e.Header.RequesterId is "999").Exists();
+
+        exists.Should().BeFalse();
     }
 }
