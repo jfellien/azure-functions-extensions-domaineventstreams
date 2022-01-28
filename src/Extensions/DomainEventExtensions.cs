@@ -1,6 +1,6 @@
 using System.Text;
+using Azure.Messaging.ServiceBus;
 using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
-using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 
 #nullable enable
@@ -15,15 +15,15 @@ namespace devCrowd.CustomBindings.EventSourcing.Extensions
         /// </summary>
         /// <param name="domainEvent"></param>
         /// <returns></returns>
-        public static Message ToServiceBusMessage(this IDomainEvent domainEvent)
+        public static ServiceBusMessage ToServiceBusMessage(this IDomainEvent domainEvent)
         {
             var eventAsString = JsonConvert.SerializeObject(domainEvent);
             var eventAsBytes = Encoding.UTF8.GetBytes(eventAsString);
 
-            var serviceBusMessage = new Message(eventAsBytes);
+            var serviceBusMessage = new ServiceBusMessage(eventAsBytes);
             var eventTypeName = domainEvent.GetType().AssemblyQualifiedName;
 
-            serviceBusMessage.UserProperties.Add(ServiceBusMessageExtensions.EVENT_TYPE, eventTypeName);
+            serviceBusMessage.ApplicationProperties.Add(ServiceBusMessageExtensions.EVENT_TYPE, eventTypeName);
 
             return serviceBusMessage;
         }

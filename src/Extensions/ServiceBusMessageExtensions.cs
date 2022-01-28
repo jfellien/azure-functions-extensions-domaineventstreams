@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
+using Azure.Messaging.ServiceBus;
 using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
-using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 
 namespace devCrowd.CustomBindings.EventSourcing.Extensions
@@ -17,14 +17,19 @@ namespace devCrowd.CustomBindings.EventSourcing.Extensions
         /// <returns></returns>
         /// <exception cref="ArgumentException">If UserProperty does not contain a Event Type property</exception>
         /// <exception cref="ArgumentException">If Event Type not available in solution</exception>
-        public static IDomainEvent ToDomainEvent(this Message serviceBusMessage)
+        public static IDomainEvent ToDomainEvent(this ServiceBusMessage serviceBusMessage)
         {
-            if (serviceBusMessage.UserProperties.ContainsKey(EVENT_TYPE) == false)
+            if (serviceBusMessage.ApplicationProperties.ContainsKey(EVENT_TYPE) == false)
             {
-                throw new ArgumentException($"Message does not contain UserProperty '{EVENT_TYPE}'");
+                throw new ArgumentException($"ServiceBusMessage does not contain Application Property '{EVENT_TYPE}'");
             }
+            
+            var eventTypeName = serviceBusMessage.ApplicationProperties[EVENT_TYPE].ToString();
 
-            var eventTypeName = serviceBusMessage.UserProperties[EVENT_TYPE].ToString();
+            if (string.IsNullOrEmpty(eventTypeName))
+            {
+                throw new ArgumentException($"Application Property '{EVENT_TYPE}' is null or empty");
+            }
 
             var eventType = Type.GetType(eventTypeName, false, true);
 
@@ -34,15 +39,9 @@ namespace devCrowd.CustomBindings.EventSourcing.Extensions
             }
 
             var messageAsString = Encoding.UTF8.GetString(serviceBusMessage.Body);
+            var domainEvent = JsonConvert.DeserializeObject(messageAsString, eventType) as IDomainEvent;
 
-            try
-            {
-                return JsonConvert.DeserializeObject(messageAsString, eventType) as IDomainEvent;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return domainEvent;
         }
     }
 }
