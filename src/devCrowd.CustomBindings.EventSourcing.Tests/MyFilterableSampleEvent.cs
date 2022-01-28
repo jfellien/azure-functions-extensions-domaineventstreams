@@ -6,6 +6,7 @@ public class MyFilterableSampleEvent :DomainEvent
 {
     public MyFilterableSampleEvent(string requesterId) : base(requesterId)
     {
+        FilterableValue = string.Empty;
     }
 
     public string FilterableValue { get; set; }
