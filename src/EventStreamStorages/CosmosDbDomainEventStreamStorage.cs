@@ -74,7 +74,7 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
                 EventId = Guid.NewGuid().ToString(),
 
                 Context = context.ToLowerInvariant(),
-                Entity = entity.ToLowerInvariant(),
+                Entity = entity?.ToLowerInvariant(),
                 EntityId = entityId,
 
                 EventName = domainEvent.GetType().Name,
