@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using devCrowd.CustomBindings.EventSourcing.EventsPublisher;
@@ -21,7 +22,7 @@ public class DomainStreamExtensionTests
     
     public DomainStreamExtensionTests()
     {
-        var eventStore = SetupEventStoreMock(CONTEXT, ENTITY, ENTITY_ID);
+        IReadAndWriteDomainEvents? eventStore = SetupEventStoreMock(CONTEXT, ENTITY, ENTITY_ID);
         
         _domainEventStream = new DomainEventStream(
             CONTEXT, ENTITY, ENTITY_ID, 
@@ -36,11 +37,11 @@ public class DomainStreamExtensionTests
 
     private IReadAndWriteDomainEvents SetupEventStoreMock(string context, string entity, string entityId)
     {
-        var eventStoreMock = new Mock<IReadAndWriteDomainEvents>();
+        Mock<IReadAndWriteDomainEvents>? eventStoreMock = new Mock<IReadAndWriteDomainEvents>();
 
         eventStoreMock.Setup(x => x.ReadBy(context, entity, entityId, default)).ReturnsAsync(() =>
         {
-            var domainEventSequence = new DomainEventSequence
+            DomainEventSequence? domainEventSequence = new DomainEventSequence
             {
                 new(1, new MySampleEvent("003")),
                 new(2, new MySampleEvent("004")),
@@ -57,11 +58,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenGetAllEventOfOneType_ItShouldReturnAllEvents()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
         
-        var allSampleEvents = events.Get<MySampleEvent>().All().ToArray();
+        MySampleEvent[]? allSampleEvents = events.Get<MySampleEvent>().All().ToArray();
 
         allSampleEvents.Count().Should().Be(5);
 
@@ -76,11 +77,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestAnyEventOfOneType_ItShouldReturnAListOfEvents()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
         
-        var anySampleEvents = events.Get<MySampleEvent>().Any().Where(e => e.Header.RequesterId is "003" or "002");
+        IEnumerable<MySampleEvent>? anySampleEvents = events.Get<MySampleEvent>().Any().Where(e => e.Header.RequesterId is "003" or "002");
 
         anySampleEvents.Count().Should().Be(2);
     }
@@ -88,11 +89,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForAnyNotExistingEventOfOneType_ItShouldReturnAnEmptyList()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
         
-        var anySampleEvents = events.Get<MyNotExistingEvent>().Any().Where(e => e.Header.RequesterId is "003" or "002");
+        IEnumerable<MyNotExistingEvent>? anySampleEvents = events.Get<MyNotExistingEvent>().Any().Where(e => e.Header.RequesterId is "003" or "002");
         
         anySampleEvents.Should().NotBeNull();
         anySampleEvents.Count().Should().Be(0);
@@ -101,11 +102,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestFirstEventOfType_ItShouldReturnTheFirst()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var firstEvent = events.Get<MyFilterableSampleEvent>().First().Where(x => x.FilterableValue == FILTER_VALUE);
+        MyFilterableSampleEvent? firstEvent = events.Get<MyFilterableSampleEvent>().First().Where(x => x.FilterableValue == FILTER_VALUE);
 
         firstEvent.Header.RequesterId.Should().Be("1111");
     }
@@ -113,11 +114,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestLastEventOfType_ItShouldReturnTheLast()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var firstEvent = events.Get<MyFilterableSampleEvent>().Last().Where(x => x.FilterableValue == FILTER_VALUE);
+        MyFilterableSampleEvent? firstEvent = events.Get<MyFilterableSampleEvent>().Last().Where(x => x.FilterableValue == FILTER_VALUE);
 
         firstEvent.Header.RequesterId.Should().Be("1112");
     }
@@ -125,11 +126,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForEarlierEventThanAnOther_ItShouldReturnTrue()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events.Event<MySampleEvent>().HappenedEarlierThan<MyFilterableSampleEvent>();
+        bool compareResult = events.Event<MySampleEvent>().HappenedEarlierThan<MyFilterableSampleEvent>();
 
         compareResult.Should().BeTrue();
     }
@@ -137,11 +138,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForEarlierEventThanAnOther_ItShouldReturnFalse()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events.Event<MyFilterableSampleEvent>().HappenedEarlierThan<MySampleEvent>();
+        bool compareResult = events.Event<MyFilterableSampleEvent>().HappenedEarlierThan<MySampleEvent>();
 
         compareResult.Should().BeFalse();
     }
@@ -149,11 +150,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForLaterEventThanAnOther_ItShouldReturnTrue()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events.Event<MyFilterableSampleEvent>().HappenedLaterThan<MySampleEvent>();
+        bool compareResult = events.Event<MyFilterableSampleEvent>().HappenedLaterThan<MySampleEvent>();
 
         compareResult.Should().BeTrue();
     }
@@ -161,11 +162,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForLaterEventThanAnOther_ItShouldReturnFalse()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events.Event<MySampleEvent>().HappenedLaterThan<MyFilterableSampleEvent>();
+        bool compareResult = events.Event<MySampleEvent>().HappenedLaterThan<MyFilterableSampleEvent>();
 
         compareResult.Should().BeFalse();
     }
@@ -173,11 +174,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificLaterEventThanAnOther_ItShouldReturnFalse()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events
+        bool compareResult = events
             .Event<MySampleEvent>()
             .Where(x => x.Header.RequesterId == "003")
             .HappenedLaterThan<MySampleEvent>()
@@ -189,11 +190,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificLaterEventThanAnOther_ItShouldReturnTrue()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events
+        bool compareResult = events
             .Event<MySampleEvent>()
             .Where(x => x.Header.RequesterId == "004")
             .HappenedLaterThan<MySampleEvent>()
@@ -205,7 +206,7 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificLaterEventThanAnOther_ItShouldThrowException()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
@@ -220,7 +221,7 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificLaterEventThanNotExistingOther_ItShouldThrowException()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
@@ -235,11 +236,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificEarlierEventThanAnOther_ItShouldReturnTrue()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events
+        bool compareResult = events
             .Event<MySampleEvent>()
             .Where(x => x.Header.RequesterId == "003")
             .HappenedEarlierThan<MySampleEvent>()
@@ -251,11 +252,11 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificEarlierEventThanAnOther_ItShouldReturnFalse()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
-        var compareResult = events
+        bool compareResult = events
             .Event<MySampleEvent>()
             .Where(x => x.Header.RequesterId == "004")
             .HappenedEarlierThan<MySampleEvent>()
@@ -267,7 +268,7 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificEarlierEventThanAnOther_ItShouldThrowException()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
@@ -282,7 +283,7 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForSpecificEarlierEventThanNotExistingOther_ItShouldThrowException()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
         
         events.Should().NotBeNull();
 
@@ -297,9 +298,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForExistingSingleEvent_ItShouldReturnTheEvent()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var singleEvent = events.Get<MySingleEvent>().TheOnlyOne();
+        MySingleEvent? singleEvent = events.Get<MySingleEvent>().TheOnlyOne();
 
         singleEvent.Should().NotBeNull();
         singleEvent.Header.RequesterId.Should().Be("011");
@@ -308,9 +309,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForNotExistingSingleEvent_ItShouldReturnNull()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var singleEvent = events.Get<MyNotExistingEvent>().TheOnlyOne();
+        MyNotExistingEvent? singleEvent = events.Get<MyNotExistingEvent>().TheOnlyOne();
 
         singleEvent.Should().BeNull();
     }
@@ -318,9 +319,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForOneSpecificEventByExpression_ItShouldReturnTheEvent()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var singleEvent = events.Get<MySampleEvent>().Where(e => e.Header.RequesterId is "003");
+        MySampleEvent? singleEvent = events.Get<MySampleEvent>().Where(e => e.Header.RequesterId is "003");
 
         singleEvent.Should().NotBeNull();
 
@@ -330,9 +331,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenRequestForOneSpecificNotExistingEventByExpression_ItShouldReturnNull()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var singleEvent = events.Get<MySampleEvent>().Where(e => e.Header.RequesterId is "030");
+        MySampleEvent? singleEvent = events.Get<MySampleEvent>().Where(e => e.Header.RequesterId is "030");
 
         singleEvent.Should().BeNull();
     }
@@ -340,9 +341,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenCheckForAnyExistingEvent_ItShouldReturnTrue()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var exists = events.Event<MySampleEvent>().Exists();
+        bool exists = events.Event<MySampleEvent>().Exists();
 
         exists.Should().BeTrue();
     }
@@ -350,9 +351,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenCheckForAnyNotExistingEvent_ItShouldReturnFalse()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var exists = events.Event<MyNotExistingEvent>().Exists();
+        bool exists = events.Event<MyNotExistingEvent>().Exists();
 
         exists.Should().BeFalse();
     }
@@ -360,9 +361,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenCheckForAnyExistingEventByExpression_ItShouldReturnTrue()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var exists = events.Event<MySampleEvent>().Where(e => e.Header.RequesterId is "003").Exists();
+        bool exists = events.Event<MySampleEvent>().Where(e => e.Header.RequesterId is "003").Exists();
 
         exists.Should().BeTrue();
     }
@@ -370,9 +371,9 @@ public class DomainStreamExtensionTests
     [Fact]
     public async Task WhenCheckForAnyNotExistingEventByExpression_ItShouldReturnFalse()
     {
-        var events = (await _domainEventStream.Events()).ToList();
+        List<IDomainEvent>? events = (await _domainEventStream.Events()).ToList();
 
-        var exists = events.Event<MySampleEvent>().Where(e => e.Header.RequesterId is "999").Exists();
+        bool exists = events.Event<MySampleEvent>().Where(e => e.Header.RequesterId is "999").Exists();
 
         exists.Should().BeFalse();
     }

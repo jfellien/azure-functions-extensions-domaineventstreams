@@ -1,24 +1,29 @@
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 using devCrowd.CustomBindings.EventSourcing.Extensions;
-using Microsoft.Azure.ServiceBus;
 
-namespace devCrowd.CustomBindings.EventSourcing.EventsPublisher
+namespace devCrowd.CustomBindings.EventSourcing.EventsPublisher;
+
+public class ServiceBusDomainEventsPublisher : IPublishDomainEvents
 {
-    public class ServiceBusDomainEventsPublisher : IPublishDomainEvents
+    private readonly string _connectionString;
+    private readonly string _topic;
+
+    public ServiceBusDomainEventsPublisher(string connectionString, string topic)
     {
-        private readonly TopicClient _topicClient;
-
-        public ServiceBusDomainEventsPublisher(string connectionString, string topic)
-        {
-            _topicClient = new TopicClient(connectionString, topic);
-        }
+        _connectionString = connectionString;
+        _topic = topic;
+    }
         
-        public Task Publish(IDomainEvent domainEvent)
-        {
-            var eventAsMessage = domainEvent.ToServiceBusMessage();
+    public async Task Publish(IDomainEvent domainEvent)
+    {
+        await using ServiceBusClient client = new(_connectionString);
 
-            return _topicClient.SendAsync(eventAsMessage);
-        }
+        ServiceBusSender sender = client.CreateSender(_topic);
+            
+        ServiceBusMessage eventAsMessage = domainEvent.ToServiceBusMessage();
+            
+        await sender.SendMessageAsync(eventAsMessage);
     }
 }

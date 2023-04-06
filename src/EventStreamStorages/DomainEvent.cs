@@ -1,22 +1,21 @@
 ﻿using System;
 
-namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
-{
-    public abstract class DomainEvent : IDomainEvent
-    {
-        private DomainEvent()
-        {
-            Header = new DomainEventHeader
-            {
-                TracingId = Guid.NewGuid().ToString()
-            };
-        }
+namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
-        protected DomainEvent(string requesterId) : this()
+public abstract class DomainEvent : IDomainEvent
+{
+    private DomainEvent()
+    {
+        Header = new DomainEventHeader
         {
-            Header.RequesterId = requesterId;
-        }
-        
-        public DomainEventHeader Header { get; set; }
+            TracingId = Guid.NewGuid().ToString()
+        };
     }
+
+    protected DomainEvent(string requesterId) : this()
+    {
+        Header.RequesterId = requesterId;
+    }
+        
+    public DomainEventHeader Header { get; set; }
 }

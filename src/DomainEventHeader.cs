@@ -1,8 +1,7 @@
-﻿namespace devCrowd.CustomBindings.EventSourcing
+﻿namespace devCrowd.CustomBindings.EventSourcing;
+
+public class DomainEventHeader
 {
-    public class DomainEventHeader
-    {
-        public string RequesterId { get; set; }
-        public string TracingId { get; set; }
-    }
+    public string RequesterId { get; set; }
+    public string TracingId { get; set; }
 }
