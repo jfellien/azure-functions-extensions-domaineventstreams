@@ -10,7 +10,7 @@ public class InsertStatementBuilderTests
     [Fact]
     public void WhenHaveTableNameOnly_ItShouldNotContainEntityAndEntityId()
     {
-        var statement = InsertStatementBuilder.GetStatement("sampleTable");
+        string? statement = InsertStatementBuilder.GetStatement("sampleTable");
 
         statement.Should().Contain("INSERT");
         statement.Should().NotContain(SqlServerDomainEventStreamStorageColumnNames.Entity);
@@ -22,7 +22,7 @@ public class InsertStatementBuilderTests
     [Fact]
     public void WhenHaveTableNameAndEntityOnly_ItShouldNotContainEntityId()
     {
-        var columnList = new StringBuilder(
+        StringBuilder? columnList = new StringBuilder(
             $"{SqlServerDomainEventStreamStorageColumnNames.EventId}, " +
             $"{SqlServerDomainEventStreamStorageColumnNames.Context}, " +
             $"{SqlServerDomainEventStreamStorageColumnNames.EventName}, " +
@@ -32,9 +32,9 @@ public class InsertStatementBuilderTests
             $"{SqlServerDomainEventStreamStorageColumnNames.PayLoad}, " +
             $"{SqlServerDomainEventStreamStorageColumnNames.Entity}");
         
-        var parameterList = new StringBuilder("@eventId, @context, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload, @entity");
+        StringBuilder? parameterList = new StringBuilder("@eventId, @context, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload, @entity");
         
-        var statement = InsertStatementBuilder.GetStatement("sampleTable","sampleEntity");
+        string? statement = InsertStatementBuilder.GetStatement("sampleTable","sampleEntity");
 
         statement.Should().Contain("INSERT");
         statement.Should().Contain(columnList.ToString());
@@ -47,7 +47,7 @@ public class InsertStatementBuilderTests
     [Fact]
     public void WhenHaveTableNameEntityAndEntityId_ItShouldContainEntityAndEntityId()
     {
-        var columnList = new StringBuilder(
+        StringBuilder? columnList = new StringBuilder(
             $"{SqlServerDomainEventStreamStorageColumnNames.EventId}, " +
             $"{SqlServerDomainEventStreamStorageColumnNames.Context}, " +
             $"{SqlServerDomainEventStreamStorageColumnNames.EventName}, " +
@@ -58,10 +58,10 @@ public class InsertStatementBuilderTests
             $"{SqlServerDomainEventStreamStorageColumnNames.Entity}, " +
             $"{SqlServerDomainEventStreamStorageColumnNames.EntityId}");
         
-        var parameterList = new StringBuilder("@eventId, @context, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload, @entity, @entityId");
+        StringBuilder? parameterList = new StringBuilder("@eventId, @context, @eventName, @eventFullName, @isoTimeStamp, @sequenceNumber, @payload, @entity, @entityId");
 
         
-        var statement = InsertStatementBuilder.GetStatement("sampleTable", "sampleEntity", "sampleEntityId");
+        string? statement = InsertStatementBuilder.GetStatement("sampleTable", "sampleEntity", "sampleEntityId");
 
         statement.Should().Contain("INSERT");
         statement.Should().Contain(columnList.ToString());

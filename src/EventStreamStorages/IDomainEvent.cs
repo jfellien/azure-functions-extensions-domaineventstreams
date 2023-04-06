@@ -1,7 +1,6 @@
-namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages
+namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
+
+public interface IDomainEvent
 {
-    public interface IDomainEvent
-    {
-        DomainEventHeader Header { get; set; }
-    }
+    DomainEventHeader Header { get; set; }
 }
