@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageLicenseFile>../LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/jfellien/azure-functions-extensions-domaineventstreams</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
