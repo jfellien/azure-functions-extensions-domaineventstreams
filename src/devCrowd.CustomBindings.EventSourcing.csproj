@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseFile>../LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/jfellien/azure-functions-extensions-domaineventstreams</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Authors>janekf</Authors>
@@ -15,6 +17,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="..\LICENSE" Pack="true" PackagePath=""/>
     <None Remove="devCrowd.CustomBindingsEventSourcing.Tests\**" />
     <None Remove="devCrowd.CustomBindings.EventSourcing.Tests\**" />
   </ItemGroup>
