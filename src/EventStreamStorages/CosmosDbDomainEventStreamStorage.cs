@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,24 +13,45 @@ namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
 public class CosmosDbDomainEventStreamStorage : IReadAndWriteDomainEvents
 {
+    private readonly JsonSerializer _defaultSerializer;
+    private readonly Container _domainEventsContainer;
+
     private bool _domainEventStreamHasBeenRead;
     private long _lastSequenceNumberOfStream;
-        
-    private Container _domainEventsContainer;
-    private JsonSerializer _defaultSerializer;
 
-    public CosmosDbDomainEventStreamStorage(string connectionString, string dbName, string collectionName)
+    public static CosmosDbDomainEventStreamStorage CreateFromConnectionString(
+        string connectionString,
+        string dbName,
+        string collectionName)
     {
-        _domainEventsContainer = new CosmosClient(connectionString).GetContainer(dbName, collectionName);
+        CosmosClient client = new(connectionString);
+        
+        return new CosmosDbDomainEventStreamStorage(client, dbName, collectionName);
+    }
+    
+    public static CosmosDbDomainEventStreamStorage CreateFromServiceEndpoint(
+        string serviceEndpoint,
+        string dbName,
+        string collectionName)
+    {
+        CosmosClient client = new(serviceEndpoint, new DefaultAzureCredential());
+        
+        return new CosmosDbDomainEventStreamStorage(client, dbName, collectionName);
+    }
 
-        JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+    private CosmosDbDomainEventStreamStorage(CosmosClient cosmosClient, string dbName, string collectionName)
+    {
+        _domainEventsContainer = cosmosClient.GetContainer(dbName, collectionName);
+
+        JsonSerializerSettings serializerSettings = new ()
         {
             DateParseHandling = DateParseHandling.None
         };
 
         _defaultSerializer = JsonSerializer.CreateDefault(serializerSettings);
     }
-
+    
+    
     public Task<DomainEventSequence> ReadBy(string context, CancellationToken cancellationToken)
     {
         QueryDefinition query = new QueryDefinition(
