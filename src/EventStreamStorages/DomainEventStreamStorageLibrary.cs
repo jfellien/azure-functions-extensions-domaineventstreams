@@ -1,6 +1,9 @@
-﻿namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
+﻿using System;
+using System.Data.Common;
 
-internal class DomainEventStreamStorageLibrary
+namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
+
+internal static class DomainEventStreamStorageLibrary
 {
     public static IReadAndWriteDomainEvents GetInstanceBy(string connectionString, string databaseName, string collectionName)
     {
@@ -8,13 +11,20 @@ internal class DomainEventStreamStorageLibrary
         {
             return new SqlServerDomainEventStreamStorage(connectionString, databaseName, collectionName);
         }
-
+        
         if (IsCosmosDbConnectionString(connectionString))
         {
-            return new CosmosDbDomainEventStreamStorage(connectionString, databaseName, collectionName);
+            return CosmosDbDomainEventStreamStorage
+                .CreateFromConnectionString(connectionString, databaseName, collectionName);
+        } 
+        
+        if (IsCosmosDbServiceEndpoint(connectionString))
+        {
+            return CosmosDbDomainEventStreamStorage
+                .CreateFromServiceEndpoint(connectionString, databaseName, collectionName);
         }
 
-        return null;
+        throw new ApplicationException("Wrong Setup for EventStore ConnectionString");
     }
 
     private static bool IsSqlServerConnectionString(string connectionString)
@@ -29,5 +39,12 @@ internal class DomainEventStreamStorageLibrary
         string lowerVersion = connectionString.ToLowerInvariant();
 
         return lowerVersion.StartsWith("accountendpoint=https://");
+    }
+    
+    private static bool IsCosmosDbServiceEndpoint(string connectionString)
+    {
+        return connectionString != null
+               && Uri.TryCreate(connectionString, UriKind.Absolute, out Uri _) 
+               && connectionString.Contains("documents.azure.com");
     }
 }

@@ -13,10 +13,10 @@ public class DomainEventStreamBindingConfiguration : IExtensionConfigProvider
     {
         context
             .AddBindingRule<DomainEventStreamAttribute>()
-            .BindToInput<DomainEventStream>(GetFromAttribute);
+            .BindToInput(GetFromAttribute);
     }
 
-    private DomainEventStream GetFromAttribute(DomainEventStreamAttribute attribute)
+    private static DomainEventStream GetFromAttribute(DomainEventStreamAttribute attribute)
     {
         string eventStoreConnectionString = Environment.GetEnvironmentVariable("EVENT_STORE_CONNECTION_STRING");
         string eventStoreDatabaseName = Environment.GetEnvironmentVariable("EVENT_STORE_DB_NAME");

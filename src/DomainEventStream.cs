@@ -7,16 +7,27 @@ using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
 namespace devCrowd.CustomBindings.EventSourcing;
 
+/// <summary>
+/// Represents an Stream of Events filtered by given parameters context, entity name and entity id
+/// </summary>
 public class DomainEventStream
 {
     private readonly string _context;
     private readonly string _entity;
+    private readonly string _entityId;
     private readonly IReadAndWriteDomainEvents _storage;
     private readonly IPublishDomainEvents _publisher;
 
-    private string _entityId;
     private DomainEventSequence _historySequence;
 
+    /// <summary>
+    /// Creates an instance with the given parameters
+    /// </summary>
+    /// <param name="context">Domain Context</param>
+    /// <param name="entity">Name of the Entity which is represented in the event stream.</param>
+    /// <param name="entityId">ID of the Entity which is represented in the event stream.</param>
+    /// <param name="storage">Event Store instance</param>
+    /// <param name="publisher">Event Handler publisher</param>
     public DomainEventStream(
         string context, string entity, string entityId, 
         IReadAndWriteDomainEvents storage, 
@@ -31,6 +42,11 @@ public class DomainEventStream
         _historySequence = new DomainEventSequence();
     }
 
+    /// <summary>
+    /// Adds an Event to the current stream
+    /// </summary>
+    /// <param name="domainEvent">Domain Event instance</param>
+    /// <returns></returns>
     public Task Append(IDomainEvent domainEvent)
     {
         return Append(new List<IDomainEvent>
@@ -38,7 +54,13 @@ public class DomainEventStream
             domainEvent
         });
     }
-        
+    
+    /// <summary>
+    /// Adds an Event to the current stream and assigns it to a specific entity.
+    /// </summary>
+    /// <param name="domainEvent">Domain Event instance</param>
+    /// <param name="entityId">Id of Entity</param>
+    /// <returns></returns>
     public Task Append(IDomainEvent domainEvent, string entityId)
     {
         return Append(new List<IDomainEvent>
@@ -47,11 +69,24 @@ public class DomainEventStream
         }, entityId);
     }
 
+    /// <summary>
+    /// Added a list of events to the current stream
+    /// </summary>
+    /// <param name="domainEvents">List of events</param>
+    /// <returns></returns>
     public Task Append(IEnumerable<IDomainEvent> domainEvents)
     {
         return WriteToStorageAndLocalHistoryAndPublish(domainEvents, _context, _entity, _entityId);
     }
-        
+    
+    /// <summary>
+    /// Adds a list of events and assigns it to a specific entity
+    /// </summary>
+    /// <param name="domainEvents">List of events</param>
+    /// <param name="entityId">Id of Entity</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">If entityId is null or empty</exception>
+    /// <exception cref="ArgumentException">If the entityId is different to its id used in the stream already.</exception>
     public Task Append(IEnumerable<IDomainEvent> domainEvents, string entityId)
     {
         if (string.IsNullOrWhiteSpace(entityId))
@@ -63,12 +98,16 @@ public class DomainEventStream
             && string.IsNullOrWhiteSpace(entityId) == false
             && _entityId.ToLowerInvariant() != entityId.ToLowerInvariant())
         {
-            throw new ArgumentException("You have set entityId but this instance of EventStream already have an EntityId");
+            throw new ArgumentException("You have set entityId but this instance of EventStream already have, but different, an EntityId");
         }
             
         return WriteToStorageAndLocalHistoryAndPublish(domainEvents, _context, _entity, entityId);
     }
 
+    /// <summary>
+    /// Gets the event stream as instance
+    /// </summary>
+    /// <returns>Event Stream</returns>
     public async Task<IEnumerable<IDomainEvent>> Events()
     {
         if (_historySequence.HasBeenSequenced)
