@@ -1,6 +1,7 @@
 ﻿using System;
+using devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 
-namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
+namespace devCrowd.CustomBindings.EventSourcing;
 
 public abstract class DomainEvent : IDomainEvent
 {

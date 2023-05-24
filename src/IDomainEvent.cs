@@ -1,4 +1,4 @@
-namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
+namespace devCrowd.CustomBindings.EventSourcing;
 
 public interface IDomainEvent
 {
