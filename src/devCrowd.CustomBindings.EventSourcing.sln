@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "devCrowd.CustomBindings.Eve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "devCrowd.CustomBindings.EventSourcing.Tests", "devCrowd.CustomBindings.EventSourcing.Tests\devCrowd.CustomBindings.EventSourcing.Tests.csproj", "{81792DF0-603E-4B4E-B478-8AE6B8481BF7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "devCrowd.CustomBindings.SampleFunctions", "Samples\devCrowd.CustomBindings.SampleFunctions\devCrowd.CustomBindings.SampleFunctions.csproj", "{EF02818D-5BB8-405E-A1F8-E09626F5A81C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{81792DF0-603E-4B4E-B478-8AE6B8481BF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81792DF0-603E-4B4E-B478-8AE6B8481BF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81792DF0-603E-4B4E-B478-8AE6B8481BF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF02818D-5BB8-405E-A1F8-E09626F5A81C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF02818D-5BB8-405E-A1F8-E09626F5A81C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF02818D-5BB8-405E-A1F8-E09626F5A81C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF02818D-5BB8-405E-A1F8-E09626F5A81C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

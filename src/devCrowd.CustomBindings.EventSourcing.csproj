@@ -16,12 +16,14 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\LICENSE" Pack="true" PackagePath=""/>
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Remove="devCrowd.CustomBindingsEventSourcing.Tests\**" />
     <None Remove="devCrowd.CustomBindings.EventSourcing.Tests\**" />
+    <None Remove="Samples\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.9.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.13.1" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.32.3" />
     <PackageReference Include="Microsoft.Azure.WebJobs" Version="3.0.37" />
@@ -32,11 +34,13 @@
   <ItemGroup>
     <Compile Remove="devCrowd.CustomBindingsEventSourcing.Tests\**" />
     <Compile Remove="devCrowd.CustomBindings.EventSourcing.Tests\**" />
+    <Compile Remove="Samples\**" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="devCrowd.CustomBindingsEventSourcing.Tests\**" />
     <EmbeddedResource Remove="devCrowd.CustomBindings.EventSourcing.Tests\**" />
+    <EmbeddedResource Remove="Samples\**" />
   </ItemGroup>
 
   <ItemGroup>
