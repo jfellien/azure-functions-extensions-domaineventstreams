@@ -25,7 +25,7 @@ jobs:
 
       - name: Detect package version
         id: get_version
-        uses: battila7/get-version-action@v2.2.1
+        uses: Simply007/get-version-action@7236f08751d7430451850869f00450fb02c25723
       
       - name: Build Version ${{ steps.get_version.outputs.version }}+${{ github.run_number }}
         run: dotnet build --configuration Release --no-restore ./src /p:PackageVersion=${{ steps.get_version.outputs.version-without-v }}
