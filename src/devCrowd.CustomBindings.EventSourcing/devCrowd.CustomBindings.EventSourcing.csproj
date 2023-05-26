@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/jfellien/azure-functions-extensions-domaineventstreams</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -48,10 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\README.md">
-      <Link>README.md</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
 </Project>
