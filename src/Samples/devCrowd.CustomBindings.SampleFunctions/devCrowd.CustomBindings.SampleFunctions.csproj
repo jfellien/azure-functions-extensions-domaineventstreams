@@ -17,5 +17,6 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\devCrowd.CustomBindings.EventSourcing.csproj" />
+      <ProjectReference Include="..\..\devCrowd.CustomBindings.EventSourcing\devCrowd.CustomBindings.EventSourcing.csproj" />
     </ItemGroup>
 </Project>

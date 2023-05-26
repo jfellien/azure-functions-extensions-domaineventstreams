@@ -186,4 +186,6 @@ public class DomainEventStream
     {
         await _publisher.Publish(domainEvent);
     }
+
+    
 }

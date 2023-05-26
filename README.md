@@ -3,6 +3,8 @@
 A simple to use Custom Binding for Azure Functions which represents a Domain Event Stream.
 The Stream can be stored in a CosmosDB or MS SQL Server, only by set up the connection string the storage will use.
 
+Since version 3.0.0 you can use the CosmosDB with an managed identity. So the connection string is only the endpoint of your CosmosDB Account.
+
 ## How to use
 
 Add the Binding to your Function like this:
@@ -19,8 +21,8 @@ public static async <your retun type> Run(
     }
 ```
 
-Well it should be explained more. `<context name>` means its the name of the context (bounded context in DDD) 
-your Domain Events related to and `<entity name>` have a similar function. Its a name of a domain entity. Both parameters
+Well, it should be explained more. `<context name>` means its the name of the context (bounded context in DDD) 
+your Domain Events are related to and `<entity name>` have a similar function. Its a name of a domain entity. Both parameters
 are used to filter the Domain Event Stream if you need to read from it.
 
 *An example*
