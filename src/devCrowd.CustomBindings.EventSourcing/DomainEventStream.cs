@@ -10,7 +10,7 @@ namespace devCrowd.CustomBindings.EventSourcing;
 /// <summary>
 /// Represents an Stream of Events filtered by given parameters context, entity name and entity id
 /// </summary>
-public class DomainEventStream
+public class DomainEventStream : IDomainEventStream
 {
     private readonly string _context;
     private readonly string _entity;
@@ -186,6 +186,4 @@ public class DomainEventStream
     {
         await _publisher.Publish(domainEvent);
     }
-
-    
 }
