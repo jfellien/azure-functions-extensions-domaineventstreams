@@ -86,12 +86,25 @@ interested in the events can subscribe this topic.
 To get the `DomainEventStream` Attribute clean and simple the infrastructure configuration will happen in
 the Application Settings (or for local development in the local.settings.json file). The Binding expects a few settings.
 
+Since you can use managed identity for CosmosDB and ServiceBus yiu will have two ways for set up the connections
+
+Unmanaged:
+
 * EVENT_STORE_CONNECTION_STRING: The connection string, where the events will stored (only CosmosDB and SQL Server available)
-* EVENT_STORE_DB_NAME: Name of the dastabase where the events will stored
+* EVENT_STORE_DB_NAME: Name of the database where the events will stored
 * DOMAIN_EVENTS_COLLECTION_NAME: Name of the collection where the events will stored (equal to table name if a SQL Server is the data sink)
 * EVENT_HANDLER_CONNECTION_STRING: Connection String to the ServiceBus which will publish the events after storing
 
-Any Domain Context needs its own topic in the ServiceBus. This topic will not created if not exists already. It should be part of automatic deployment.
+Managed:
+
+* EVENT_STORE__accountEndpoint: The account endpoint of CosmosDB, where the events will be stored
+* EVENT_STORE_DB_NAME: Name of the database where the events will stored
+* DOMAIN_EVENTS_COLLECTION_NAME: Name of the collection where the events will stored (equal to table name if a SQL Server is the data sink)
+* EVENT_HANDLER__fullyQualifiedNameSpace: Fully qualified namespace of the ServiceBus which will publish the events after storing
+
+Any Domain Context needs its own topic in the ServiceBus. This topic will not created if not exists already. It should be part of your deployment.
+
+(In case you will ask why not automatically created. It's about security. Your Application needs admin access to the Service Bus then.)
 
 ## Sql Server as sink
 If you use a Sql Server as Data Source/EventSource you need a table to store the events. Here comes the Create script:
