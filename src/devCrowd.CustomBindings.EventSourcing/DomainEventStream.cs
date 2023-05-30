@@ -21,6 +21,14 @@ public class DomainEventStream : IDomainEventStream
     private DomainEventSequence _historySequence;
 
     /// <summary>
+    /// Just an empty constructor which shouldn't use. Its just for test reasons.
+    /// </summary>
+    public DomainEventStream()
+    {
+        
+    }
+    
+    /// <summary>
     /// Creates an instance with the given parameters
     /// </summary>
     /// <param name="context">Domain Context</param>
