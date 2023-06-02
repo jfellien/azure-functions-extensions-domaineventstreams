@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using devCrowd.CustomBindings.EventSourcing;
@@ -15,7 +16,7 @@ namespace devCrowd.CustomBindings.SampleFunctions;
 public static class WithHttpTrigger
 {
     [FunctionName("WithHttpTrigger")]
-    public static async Task<IActionResult> RunAsync(
+    public static async Task<HttpStatusCode> RunAsync(
         [HttpTrigger(AuthorizationLevel.Function, nameof(HttpMethod.Post), Route = null)] 
         SampleEntity sampleEntity,
         [DomainEventStream("%DOMAIN_CONTEXT_NAME%","%DOMAIN_ENTITY_NAME%", "{entityId}")]
@@ -34,6 +35,6 @@ public static class WithHttpTrigger
         
         log.LogInformation("Entity has been appended to DomainStream");
 
-        return new AcceptedResult();
+        return HttpStatusCode.Accepted;
     }
 }
