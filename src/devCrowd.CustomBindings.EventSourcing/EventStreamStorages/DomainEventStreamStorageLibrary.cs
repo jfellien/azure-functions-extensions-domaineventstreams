@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 
 namespace devCrowd.CustomBindings.EventSourcing.EventStreamStorages;
 

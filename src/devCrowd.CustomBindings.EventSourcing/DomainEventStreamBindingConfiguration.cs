@@ -40,17 +40,17 @@ public class DomainEventStreamBindingConfiguration : IExtensionConfigProvider
                 $"Unexpected type of Connection String (starts with: '{eventStoreConnectionString[..15]}'). Can not instantiate a DomainEventStream Storage. Please fix the Connection String or use only a Sql Server or CosmosDB Connection String.");
         }
             
-        string serviceBusConnectionString = Environment.GetEnvironmentVariable("EVENT_HANDLER_CONNECTION_STRING")
+        string serviceBusConnection = Environment.GetEnvironmentVariable("EVENT_HANDLER_CONNECTION_STRING")
                                             ??Environment.GetEnvironmentVariable("EVENT_HANDLER__fullyQualifiedNamespace");
             
-        if (string.IsNullOrEmpty(serviceBusConnectionString))
+        if (string.IsNullOrEmpty(serviceBusConnection))
         {
             throw new ArgumentException("EVENT_HANDLER Connection String not set in Application Settings. " +
                                         "Needs EVENT_HANDLER_CONNECTION_STRING or for managed identity EVENT_HANDLER__fullyQualifiedNamespace");
         }
             
         ServiceBusDomainEventsPublisher domainEventsPublisher = new (
-            serviceBusConnectionString,
+            serviceBusConnection,
             attribute.ContextName);
             
         return new DomainEventStream(
